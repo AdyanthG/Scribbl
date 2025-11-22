@@ -27,6 +27,12 @@ export function UploadZone() {
             if (!res.ok) throw new Error("Upload failed");
 
             const data = await res.json();
+
+            // Save to LocalStorage for "My Sketches"
+            const mySketches = JSON.parse(localStorage.getItem("my_sketches") || "[]");
+            mySketches.push(data.project_id);
+            localStorage.setItem("my_sketches", JSON.stringify(mySketches));
+
             router.push(`/project/${data.project_id}`);
 
         } catch (error) {

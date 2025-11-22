@@ -51,18 +51,22 @@ async def create_project(background_tasks: BackgroundTasks, file: UploadFile = F
     return {"project_id": project_id, "status": "queued"}
 
 @router.get("/list")
-def list_projects():
+def list_projects(ids: str = None):
     """
-    List all projects. 
-    In a real app, this would filter by user_id.
-    For now, we return all projects in the in-memory store.
+    List projects. 
+    If 'ids' param is provided (comma-separated), return only those projects.
+    Otherwise, return all (admin view).
     """
-    # Convert dict to list and sort by something if needed
-    # We don't have timestamps in the status dict yet, so just return list
-    return [
+    all_projects = [
         {"id": k, **v} 
         for k, v in project_status.items()
     ]
+    
+    if ids:
+        id_list = ids.split(",")
+        return [p for p in all_projects if p["id"] in id_list]
+        
+    return all_projects
 
 @router.get("/{project_id}/status")
 def get_status(project_id: str):

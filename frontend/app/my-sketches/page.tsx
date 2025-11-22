@@ -19,7 +19,16 @@ export default function MySketchesPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch("http://localhost:8000/projects/list")
+        const mySketches = JSON.parse(localStorage.getItem("my_sketches") || "[]");
+
+        if (mySketches.length === 0) {
+            setProjects([]);
+            setLoading(false);
+            return;
+        }
+
+        const idsParam = mySketches.join(",");
+        fetch(`/api/projects/list?ids=${idsParam}`)
             .then((res) => res.json())
             .then((data) => {
                 setProjects(data);
@@ -124,7 +133,7 @@ export default function MySketchesPage() {
                                     {/* Status Badge */}
                                     <div className="mt-4 flex items-center gap-2">
                                         <div className={`w-2 h-2 rounded-full ${project.status === "completed" ? "bg-green-500" :
-                                                project.status === "failed" ? "bg-red-500" : "bg-yellow-500 animate-pulse"
+                                            project.status === "failed" ? "bg-red-500" : "bg-yellow-500 animate-pulse"
                                             }`} />
                                         <span className="text-xs font-medium uppercase tracking-wider text-foreground/60">
                                             {project.status}
