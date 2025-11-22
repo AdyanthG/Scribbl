@@ -57,11 +57,14 @@ class ProjectOrchestrator:
             loop = asyncio.get_running_loop()
             
             # Render scenes in parallel (Max 5 minutes)
-            render_tasks = []
-            for scene in scenes:
-                task = loop.run_in_executor(None, self.video_renderer.render_scene, scene)
-                render_tasks.append(task)
-                
+            # Limit concurrency to 2 to prevent OOM on Render
+            sem = asyncio.Semaphore(2)
+
+            async def render_with_limit(scene):
+                async with sem:
+                    return await loop.run_in_executor(None, self.video_renderer.render_scene, scene)
+
+            render_tasks = [render_with_limit(s) for s in scenes]
             scene_paths = await asyncio.wait_for(asyncio.gather(*render_tasks), timeout=300)
                 
             final_video_path = self.video_renderer.concat_scenes(scene_paths)

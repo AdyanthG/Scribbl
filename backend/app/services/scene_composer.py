@@ -37,13 +37,17 @@ class SceneComposer:
         # 3. Generate Audio in Parallel (Max 2 minutes)
         print(f"Generating audio for {len(storyboard['scenes'])} scenes...")
         
+        # Limit concurrency to 5 to prevent OOM/Rate limits
+        sem = asyncio.Semaphore(5)
+
         async def generate_audio_for_scene(scene_data):
-            narration = scene_data.get("narration", "")
-            if narration:
-                # Run TTS in executor to avoid blocking
-                loop = asyncio.get_running_loop()
-                return await loop.run_in_executor(None, self.tts_engine.generate_audio, narration)
-            return None
+            async with sem:
+                narration = scene_data.get("narration", "")
+                if narration:
+                    # Run TTS in executor to avoid blocking
+                    loop = asyncio.get_running_loop()
+                    return await loop.run_in_executor(None, self.tts_engine.generate_audio, narration)
+                return None
 
         audio_tasks = [generate_audio_for_scene(s) for s in storyboard["scenes"]]
         audio_paths = await asyncio.wait_for(asyncio.gather(*audio_tasks), timeout=120)
