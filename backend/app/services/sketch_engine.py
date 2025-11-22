@@ -112,7 +112,7 @@ class SketchEngine:
         prompt = self.build_prompt(description, accents, allow_text)
 
         # Retry logic for 429/Rate Limits
-        max_retries = 5
+        max_retries = 20
         base_delay = 2
 
         for attempt in range(max_retries):
@@ -133,8 +133,11 @@ class SketchEngine:
                 if is_rate_limit and attempt < max_retries - 1:
                     # If we hit a rate limit, wait significantly longer
                     # Replicate free tier is 6 req/min, so we need ~10s gap
-                    delay = (base_delay * (2 ** attempt)) + 10 
-                    print(f"Rate limit hit (Attempt {attempt+1}/{max_retries}). Cooling down for {delay}s...")
+                    # Add random jitter to prevent thundering herd
+                    import random
+                    jitter = random.uniform(1, 5)
+                    delay = (base_delay * (1.5 ** attempt)) + 10 + jitter
+                    print(f"Rate limit hit (Attempt {attempt+1}/{max_retries}). Cooling down for {delay:.1f}s...")
                     import time
                     time.sleep(delay)
                 elif attempt < max_retries - 1:
