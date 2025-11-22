@@ -190,9 +190,9 @@ class SketchEngine:
                 accents = item.get("accents")
                 allow_text = item.get("allow_text", True)
 
-                return result
+                return await loop.run_in_executor(None, self.generate, desc, accents, allow_text)
 
-        tasks = [limited_generate(item) for item in items]
+        tasks = [run_single(item) for item in items]
 
         # Wait for all to complete
         results = await asyncio.gather(*tasks)
