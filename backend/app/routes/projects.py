@@ -85,3 +85,16 @@ def get_status(project_id: str):
     if not status:
         raise HTTPException(status_code=404, detail="Project not found")
     return status
+
+@router.delete("/{project_id}")
+def delete_project(project_id: str):
+    """
+    Delete a project's status file.
+    """
+    try:
+        storage.delete_file(f"projects/{project_id}/status.json")
+        # Ideally we would delete the folder too, but Supabase Storage doesn't support folder deletion easily
+        # For now, deleting the status file effectively "hides" it from the list
+        return {"status": "deleted"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

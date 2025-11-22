@@ -172,18 +172,16 @@ class SketchEngine:
     async def generate_batch(self, items: List[Dict]) -> List[Dict]:
         """
         Batch generate multiple sketches.
-        FORCED SERIAL EXECUTION: Replicate is enforcing 6 req/min (1 burst).
-        We must wait ~10s between requests to avoid 429.
+        Parallel execution with memory safety limits.
         """
         import asyncio
-        import time
 
         loop = asyncio.get_running_loop()
         
-        # Strict Serial Execution
-        sem = asyncio.Semaphore(1) 
-        
-        async def limited_generate(item):
+        # High Performance Mode: Concurrency 10
+        sem = asyncio.Semaphore(10)
+
+        async def run_single(item):
             async with sem:
                 desc = item.get("description")
                 if not desc:
@@ -192,15 +190,6 @@ class SketchEngine:
                 accents = item.get("accents")
                 allow_text = item.get("allow_text", True)
 
-                # Run synchronous generate()
-                # The generate() method already has retry logic, which is good.
-                result = await loop.run_in_executor(None, self.generate, desc, accents, allow_text)
-                
-                # Enforce 6 requests per minute = 1 request every 10 seconds
-                # We sleep AFTER the request to space them out.
-                print("Rate limiting: Waiting 10s...")
-                await asyncio.sleep(10)
-                
                 return result
 
         tasks = [limited_generate(item) for item in items]

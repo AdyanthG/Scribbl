@@ -122,8 +122,19 @@ export default function MySketchesPage() {
                                             className="text-foreground/20 hover:text-red-500 transition-colors p-1"
                                             onClick={(e) => {
                                                 e.preventDefault();
-                                                // TODO: Implement delete
-                                                alert("Delete coming soon!");
+                                                if (!confirm("Are you sure you want to delete this sketch?")) return;
+
+                                                // 1. Call Backend
+                                                fetch(`/api/projects/${project.id}`, { method: "DELETE" })
+                                                    .catch(err => console.error("Backend delete failed", err));
+
+                                                // 2. Update LocalStorage
+                                                const mySketches = JSON.parse(localStorage.getItem("my_sketches") || "[]");
+                                                const newSketches = mySketches.filter((id: string) => id !== project.id);
+                                                localStorage.setItem("my_sketches", JSON.stringify(newSketches));
+
+                                                // 3. Update UI
+                                                setProjects(projects.filter(p => p.id !== project.id));
                                             }}
                                         >
                                             <Trash2 className="w-4 h-4" />

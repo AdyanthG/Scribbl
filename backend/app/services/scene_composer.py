@@ -37,8 +37,8 @@ class SceneComposer:
         # 3. Generate Audio in Parallel (Max 2 minutes)
         print(f"Generating audio for {len(storyboard['scenes'])} scenes...")
         
-        # Limit concurrency to 5 to prevent OOM/Rate limits
-        sem = asyncio.Semaphore(5)
+        # High Performance Mode: Concurrency 10
+        sem = asyncio.Semaphore(10)
 
         async def generate_audio_for_scene(scene_data):
             async with sem:
@@ -50,7 +50,7 @@ class SceneComposer:
                 return None
 
         audio_tasks = [generate_audio_for_scene(s) for s in storyboard["scenes"]]
-        audio_paths = await asyncio.wait_for(asyncio.gather(*audio_tasks), timeout=120)
+        audio_paths = await asyncio.gather(*audio_tasks)
 
         scenes = []
         
