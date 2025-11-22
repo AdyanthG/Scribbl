@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fdfbf7;
+  --foreground: #1a1a1a;
+  --primary: #2563eb;
+  --secondary: #dc2626;
+  --accent: #facc15;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  
+  --font-sans: var(--font-inter);
+  --font-sketch: var(--font-patrick);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+/* Sketchy Utilities */
+.sketch-border {
+  border: 2px solid var(--foreground);
+  border-radius: 2px 255px 3px 25px / 255px 5px 225px 3px;
+}
+
+.sketch-box {
+  border: 2px solid var(--foreground);
+  border-radius: 2% 6% 5% 4% / 1% 1% 2% 4%;
+  background: white;
+  box-shadow: 2px 3px 0px 0px rgba(0,0,0,0.1);
+}

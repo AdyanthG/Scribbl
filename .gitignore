@@ -1,0 +1,92 @@
+# -----------------------------
+# Node / Next.js
+# -----------------------------
+frontend/node_modules/
+frontend/.next/
+frontend/.turbo/
+frontend/.vercel/
+frontend/.env
+frontend/.env.local
+frontend/.env.development
+frontend/.env.production
+frontend/.env.test
+
+# Build output
+frontend/out/
+frontend/dist/
+
+# Logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+
+# -----------------------------
+# Python / FastAPI Backend
+# -----------------------------
+backend/.venv/
+backend/venv/
+backend/__pycache__/
+backend/**/*.pyc
+backend/**/__pycache__/
+
+# Local environment variables
+backend/.env
+
+# Python build / cache
+backend/build/
+backend/dist/
+backend/*.egg-info/
+backend/.pytest_cache/
+
+# Temporary files
+backend/tmp/
+backend/temp/
+backend/generated/
+backend/output/
+backend/cache/
+
+
+# -----------------------------
+# Video & AI Generated Assets
+# -----------------------------
+# (These files can be huge)
+*.mp4
+*.wav
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+backend/videos/
+backend/sketches/
+backend/audio/
+backend/frames/
+backend/renders/
+
+
+# -----------------------------
+# Supabase Local Dev Files
+# -----------------------------
+supabase/.temp/
+supabase/.branches/
+
+
+# -----------------------------
+# OS / Editor Junk
+# -----------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
+*.log
+
+
+# -----------------------------
+# Git Ignored Secrets
+# -----------------------------
+.env
+.env.local
+.env.*.local
