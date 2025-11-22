@@ -5,7 +5,7 @@
     "rewrites": [
         {
             "source": "/api/:path*",
-            "destination": "https://scribbl-np5d.onrender.com/:path*"
+            "destination": "https://scribbl-4ptpc.ondigitalocean.app/:path*"
         }
     ]
 }
