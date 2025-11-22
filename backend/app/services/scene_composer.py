@@ -34,7 +34,7 @@ class SceneComposer:
         
         scenes = []
         
-        # 3. Generate Audio in Parallel
+        # 3. Generate Audio in Parallel (Max 2 minutes)
         print(f"Generating audio for {len(storyboard['scenes'])} scenes...")
         
         async def generate_audio_for_scene(scene_data):
@@ -46,7 +46,7 @@ class SceneComposer:
             return None
 
         audio_tasks = [generate_audio_for_scene(s) for s in storyboard["scenes"]]
-        audio_paths = await asyncio.gather(*audio_tasks)
+        audio_paths = await asyncio.wait_for(asyncio.gather(*audio_tasks), timeout=120)
 
         scenes = []
         

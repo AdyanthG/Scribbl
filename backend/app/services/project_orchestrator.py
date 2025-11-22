@@ -56,13 +56,13 @@ class ProjectOrchestrator:
             
             loop = asyncio.get_running_loop()
             
-            # Render scenes in parallel
+            # Render scenes in parallel (Max 5 minutes)
             render_tasks = []
             for scene in scenes:
                 task = loop.run_in_executor(None, self.video_renderer.render_scene, scene)
                 render_tasks.append(task)
                 
-            scene_paths = await asyncio.gather(*render_tasks)
+            scene_paths = await asyncio.wait_for(asyncio.gather(*render_tasks), timeout=300)
                 
             final_video_path = self.video_renderer.concat_scenes(scene_paths)
             
@@ -81,5 +81,17 @@ class ProjectOrchestrator:
             return final_url
 
         except Exception as e:
-            print(f"[{project_id}] Pipeline FAILED: {e}")
+            print(f"[{project_id}] CRITICAL PIPELINE ERROR: {e}")
+            import traceback
+            traceback.print_exc()
+            
+            try:
+                storage.save_json(status_path, {
+                    "id": project_id,
+                    "status": "failed", 
+                    "error": str(e)
+                })
+            except Exception as write_err:
+                print(f"[{project_id}] Failed to write error status: {write_err}")
+            
             raise e
