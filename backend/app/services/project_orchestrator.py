@@ -92,7 +92,7 @@ class ProjectOrchestrator:
             traceback.print_exc()
             
             try:
-                storage.save_json(status_path, {
+                self.storage.save_json(status_path, {
                     "id": project_id,
                     "status": "failed", 
                     "error": str(e)

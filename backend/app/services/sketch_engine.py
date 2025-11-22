@@ -5,6 +5,8 @@ import requests
 from typing import Dict, List, Optional
 from PIL import Image, ImageFilter
 import numpy as np
+import asyncio
+import time
 from app.services.storage import StorageManager
 
 
@@ -129,8 +131,16 @@ class SketchEngine:
             except Exception as e:
                 is_rate_limit = "429" in str(e) or "rate limit" in str(e).lower()
                 if is_rate_limit and attempt < max_retries - 1:
-                    delay = base_delay * (2 ** attempt) # 2, 4, 8, 16...
-                    print(f"Rate limit hit. Retrying in {delay}s...")
+                    # If we hit a rate limit, wait significantly longer
+                    # Replicate free tier is 6 req/min, so we need ~10s gap
+                    delay = (base_delay * (2 ** attempt)) + 10 
+                    print(f"Rate limit hit (Attempt {attempt+1}/{max_retries}). Cooling down for {delay}s...")
+                    import time
+                    time.sleep(delay)
+                elif attempt < max_retries - 1:
+                    # Normal error, short retry
+                    delay = base_delay * (2 ** attempt)
+                    print(f"Generation error: {e}. Retrying in {delay}s...")
                     import time
                     time.sleep(delay)
                 else:
@@ -174,7 +184,6 @@ class SketchEngine:
         Batch generate multiple sketches.
         Parallel execution with memory safety limits.
         """
-        import asyncio
 
         loop = asyncio.get_running_loop()
         

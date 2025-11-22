@@ -45,11 +45,6 @@ export const metadata: Metadata = {
     description: "Transform boring PDFs and textbooks into engaging, hand-drawn sketch videos instantly.",
     creator: "@scribblstudy",
   },
-  icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
-  },
 };
 
 export default function RootLayout({
