@@ -22,7 +22,7 @@ export default function ProjectPage() {
 
         const poll = async () => {
             try {
-                const res = await fetch(`http://localhost:8000/projects/${id}/status`);
+                const res = await fetch(`/api/projects/${id}/status`);
                 if (res.ok) {
                     const data = await res.json();
                     setStatus(data);

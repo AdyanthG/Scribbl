@@ -19,7 +19,7 @@ export function UploadZone() {
         formData.append("file", file);
 
         try {
-            const res = await fetch("http://localhost:8000/projects/create", {
+            const res = await fetch("/api/projects/create", {
                 method: "POST",
                 body: formData,
             });
@@ -75,7 +75,7 @@ export function UploadZone() {
                 <input
                     id="file-upload"
                     type="file"
-                    accept=".pdf"
+                    accept="application/pdf"
                     className="hidden"
                     onChange={(e) => {
                         const file = e.target.files?.[0];
