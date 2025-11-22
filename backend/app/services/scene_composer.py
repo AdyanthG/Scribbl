@@ -34,7 +34,23 @@ class SceneComposer:
         
         scenes = []
         
-        # 3. Map back to scenes and generate audio
+        # 3. Generate Audio in Parallel
+        print(f"Generating audio for {len(storyboard['scenes'])} scenes...")
+        
+        async def generate_audio_for_scene(scene_data):
+            narration = scene_data.get("narration", "")
+            if narration:
+                # Run TTS in executor to avoid blocking
+                loop = asyncio.get_running_loop()
+                return await loop.run_in_executor(None, self.tts_engine.generate_audio, narration)
+            return None
+
+        audio_tasks = [generate_audio_for_scene(s) for s in storyboard["scenes"]]
+        audio_paths = await asyncio.gather(*audio_tasks)
+
+        scenes = []
+        
+        # 4. Map back to scenes
         for i, s in enumerate(storyboard["scenes"]):
             sketch_data = sketches[i]
             sketch_url = sketch_data["url"]
@@ -46,20 +62,13 @@ class SceneComposer:
             with open(tmp_path, "wb") as f:
                 f.write(raw)
             
-            # Generate Audio
-            narration = s.get("narration", "")
-            audio_path = None
-            if narration:
-                audio_path = self.tts_engine.generate_audio(narration)
-
-            scene = Scene(
+            scenes.append(Scene(
                 sketch_path=tmp_path,
                 text=s.get("text_overlay", ""),
                 duration=s.get("duration_seconds", 4),
                 motion="zoom_in", 
-                audio_path=audio_path,
-                narration=narration
-            )
-            scenes.append(scene)
+                audio_path=audio_paths[i],
+                narration=s.get("narration", "")
+            ))
             
         return scenes

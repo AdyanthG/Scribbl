@@ -31,3 +31,24 @@ class StorageManager:
 
     def delete_file(self, path: str):
         supabase.storage.from_(self.bucket).remove(path)
+
+    def save_json(self, path: str, data: dict):
+        import json
+        json_str = json.dumps(data)
+        # Upload as string
+        res = supabase.storage.from_(self.bucket).upload(
+            path, 
+            json_str.encode(), 
+            {"content-type": "application/json", "upsert": "true"}
+        )
+        if "error" in str(res).lower():
+            raise Exception(f"Upload failed: {res}")
+
+    def get_json(self, path: str) -> dict:
+        import json
+        try:
+            data = supabase.storage.from_(self.bucket).download(path)
+            return json.loads(data)
+        except Exception as e:
+            print(f"Error reading JSON {path}: {e}")
+            return None

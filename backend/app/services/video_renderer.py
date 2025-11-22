@@ -112,6 +112,7 @@ class VideoRenderer:
                 acodec='aac',
                 pix_fmt='yuv420p',
                 r=25,
+                preset='ultrafast',
                 shortest=None
             )
             out.run(overwrite_output=True, quiet=True)

@@ -53,10 +53,16 @@ class ProjectOrchestrator:
             
             # 5. Render Scenes & Final Video
             await update_status("rendering")
-            scene_paths = []
+            
+            loop = asyncio.get_running_loop()
+            
+            # Render scenes in parallel
+            render_tasks = []
             for scene in scenes:
-                path = self.video_renderer.render_scene(scene)
-                scene_paths.append(path)
+                task = loop.run_in_executor(None, self.video_renderer.render_scene, scene)
+                render_tasks.append(task)
+                
+            scene_paths = await asyncio.gather(*render_tasks)
                 
             final_video_path = self.video_renderer.concat_scenes(scene_paths)
             
