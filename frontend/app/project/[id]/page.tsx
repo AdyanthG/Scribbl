@@ -108,6 +108,10 @@ export default function ProjectPage() {
                         <div className="w-full bg-foreground/10 h-2 rounded-full overflow-hidden">
                             <div className="h-full bg-primary animate-progress-indeterminate" />
                         </div>
+
+                        <p className="text-xs text-foreground/40 font-sketch max-w-xs">
+                            (Beta Note: Video generation may take a while. Hang tight!)
+                        </p>
                     </div>
                 )}
             </main>
