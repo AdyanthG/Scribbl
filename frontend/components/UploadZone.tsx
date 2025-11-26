@@ -24,11 +24,7 @@ export function UploadZone() {
                 body: formData,
             });
 
-            if (!res.ok) {
-                const text = await res.text();
-                console.error("Upload failed:", res.status, text);
-                throw new Error(`Upload failed: ${res.status} ${text}`);
-            }
+            if (!res.ok) throw new Error("Upload failed");
 
             const data = await res.json();
 

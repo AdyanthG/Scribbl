@@ -30,16 +30,12 @@ class SceneComposer:
             
         # 2. Generate all sketches in parallel
         print(f"Generating {len(batch_items)} sketches...")
-        import time
-        t0 = time.time()
-        sketches = await self.sketch_engine.generate_batch(batch_items, keep_local=True)
-        print(f"Sketch generation took {time.time() - t0:.2f}s")
+        sketches = await self.sketch_engine.generate_batch(batch_items)
         
         scenes = []
         
         # 3. Generate Audio in Parallel (Max 2 minutes)
         print(f"Generating audio for {len(storyboard['scenes'])} scenes...")
-        t0 = time.time()
         
         # High Performance Mode: Concurrency 10
         sem = asyncio.Semaphore(10)
@@ -55,26 +51,20 @@ class SceneComposer:
 
         audio_tasks = [generate_audio_for_scene(s) for s in storyboard["scenes"]]
         audio_paths = await asyncio.gather(*audio_tasks)
-        print(f"Audio generation took {time.time() - t0:.2f}s")
 
         scenes = []
         
         # 4. Map back to scenes
         for i, s in enumerate(storyboard["scenes"]):
             sketch_data = sketches[i]
+            sketch_url = sketch_data["url"]
             
-            # Optimization: Use local path if available to avoid re-downloading
-            if "local_path" in sketch_data and os.path.exists(sketch_data["local_path"]):
-                tmp_path = sketch_data["local_path"]
-            else:
-                # Fallback: Download from URL
-                sketch_url = sketch_data["url"]
-                file_id = str(uuid.uuid4())
-                tmp_path = f"/tmp/sketch_{file_id}.png"
-                
-                raw = requests.get(sketch_url).content
-                with open(tmp_path, "wb") as f:
-                    f.write(raw)
+            file_id = str(uuid.uuid4())
+            tmp_path = f"/tmp/sketch_{file_id}.png"
+            
+            raw = requests.get(sketch_url).content
+            with open(tmp_path, "wb") as f:
+                f.write(raw)
             
             scenes.append(Scene(
                 sketch_path=tmp_path,

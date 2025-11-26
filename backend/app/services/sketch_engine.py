@@ -103,7 +103,7 @@ class SketchEngine:
     # -------------------------------------------------------------
     # Single Sketch Generation
     # -------------------------------------------------------------
-    def generate(self, description: str, accents: Optional[List[str]] = None, allow_text: bool = True, keep_local: bool = False) -> Dict:
+    def generate(self, description: str, accents: Optional[List[str]] = None, allow_text: bool = True) -> Dict:
         """
         Generate a single sketch from a description.
         """
@@ -167,24 +167,22 @@ class SketchEngine:
         dest = f"sketches/{file_id}.png"
         final_url = self.storage.upload_file(tmp_path, dest)
 
-        result = {
+        os.remove(tmp_path)
+
+        return {
             "id": file_id,
             "url": final_url,
             "prompt": prompt,
         }
 
-        if keep_local:
-            result["local_path"] = tmp_path
-        else:
-            os.remove(tmp_path)
-
-        return result
-
 
     # -------------------------------------------------------------
     # Batch Generation
     # -------------------------------------------------------------
-    async def generate_batch(self, items: List[Dict], keep_local: bool = False) -> List[Dict]:
+    # -------------------------------------------------------------
+    # Batch Generation
+    # -------------------------------------------------------------
+    async def generate_batch(self, items: List[Dict]) -> List[Dict]:
         """
         Batch generate multiple sketches.
         Parallel execution with memory safety limits.
@@ -204,7 +202,7 @@ class SketchEngine:
                 accents = item.get("accents")
                 allow_text = item.get("allow_text", True)
 
-                return await loop.run_in_executor(None, self.generate, desc, accents, allow_text, keep_local)
+                return await loop.run_in_executor(None, self.generate, desc, accents, allow_text)
 
         tasks = [run_single(item) for item in items]
 

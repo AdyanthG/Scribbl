@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Header } from "@/components/Header";
-import { Loader2, Play, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
 
 interface ProjectStatus {
     status: "queued" | "processing" | "completed" | "failed";
